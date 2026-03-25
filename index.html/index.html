@@ -5,50 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title> 박정훈 보고싶어 !!!</title>
     <style>
-        /* 킹받는 핑크 공주 감성 & 모바일 최적화 */
         body { background-color: #ffb6c1; font-family: 'Courier New', monospace; overflow: hidden; text-align: center; user-select: none; padding-top: 20px; position: relative; margin: 0; height: 100vh; }
-        
         .header { background: #ff69b4; color: yellow; padding: 10px; font-size: 1.5em; font-weight: bold; border-bottom: 5px solid yellow; animation: blink 0.2s infinite; display: inline-block; width: 80%; margin-bottom: 20px; z-index: 10; position: relative;}
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        .score-board { font-size: 1.2em; color: black; margin-bottom: 20px; display: flex; justify-content: space-around; background: #fff0f5; border: 3px solid #ff69b4; padding: 10px; width: 90%; margin: 0 auto 20px; z-index: 10; position: relative; border-radius: 10px; box-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { font-size: 1.2em; color: black; margin-bottom: 20px; display: flex; justify-content: space-around; background: #fff0f5; border: 3px solid #ff69b4; padding: 10px; width: 90%; margin: 0 auto 20px; z-index: 10; position: relative; border-radius: 10px; }
         #timer { color: red; font-weight: bold; }
-
-        /* 타겟 (정훈님 사진) - 모바일 크기 조절 */
-        #target { 
-            position: absolute; width: 100px; 
-            cursor: crosshair; display: none; 
-            border: 3px solid #ff1493; box-shadow: 0 0 15px #ff1493; 
-            transition: all 0.3s ease-out; 
-            z-index: 50;
-            touch-action: none; /* 터치 시 화면 밀림 방지 */
-            border-radius: 50%; /* 사진을 동그랗게 만들어서 더 킹받게 */
-        }
-
+        #target { position: absolute; width: 120px; height: 120px; object-fit: cover; cursor: crosshair; display: none; border: 4px solid #ff1493; box-shadow: 0 0 15px #ff1493; transition: all 0.3s ease-out; z-index: 50; touch-action: none; border-radius: 50%; background-color: white; }
         #game-over { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 100; padding: 20px; box-sizing: border-box; }
-        #game-over h2 { font-size: 2.5em; color: #ff69b4; margin-bottom: 10px; }
-        #result-msg { font-size: 1.3em; margin: 20px; color: white; line-height: 1.4; }
-        button { background: #fff0f5; border: 2px solid #ff69b4; padding: 15px 30px; font-size: 1.1em; cursor: pointer; font-weight: bold; color: black; margin-top: 20px; border-radius: 10px; box-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
-        button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
-        
+        #game-over h2 { font-size: 2.5em; color: #ff69b4; }
+        button { background: #fff0f5; border: 2px solid #ff69b4; padding: 15px 30px; font-size: 1.1em; cursor: pointer; font-weight: bold; color: black; margin-top: 20px; border-radius: 10px; }
         .heart { position: absolute; color: rgba(255, 255, 255, 0.4); pointer-events: none; z-index: 1; }
     </style>
 </head>
 <body>
 
     <div class="header"> 💕 박정훈 때리기 💕 </div>
-
     <div class="score-board">
         <div>타격: <span id="score">0</span>회</div>
         <div>남은 시간: <span id="timer">5.0</span>초</div>
     </div>
 
-    <img src="hoon" id="target" onclick="hitTarget()" ontouchstart="hitTarget()" onerror="this.src='index/hoon'; this.onerror=null;">
+    <img src="hoon.jpg" id="target" 
+         onclick="hitTarget()" 
+         ontouchstart="hitTarget()"
+         onerror="tryNext(this)">
 
     <div id="game-over">
         <h2> 끝 !!!! </h2>
-        <p id="result-msg"></p>
-        <p style="color: yellow; margin-bottom: 30px; font-size: 1.1em;">※ 똥 먹어. ※</p>
+        <p id="result-msg" style="color:white; font-size:1.2em;"></p>
+        <p style="color: yellow; margin-bottom: 30px;">※ 똥 먹어. ※</p>
         <button onclick="startGame()">완전 버터떡이네 똥아</button>
     </div>
 
@@ -60,14 +45,22 @@
         const gameOverEl = document.getElementById('game-over');
         const resultMsgEl = document.getElementById('result-msg');
 
-        // 하트 배경 생성
+        // 사진 찾기용 보조 함수
+        let attempts = 0;
+        function tryNext(img) {
+            const sources = ['hoon', 'index/hoon.jpg', 'index/hoon', 'HOON.JPG', 'HOON.jpg'];
+            if (attempts < sources.length) {
+                img.src = sources[attempts];
+                attempts++;
+            } else {
+                console.log("사진을 찾을 수 없습니다.");
+            }
+        }
+
         for(let i=0; i<20; i++) {
             let heart = document.createElement('div');
-            heart.className = 'heart';
-            heart.innerText = '❤';
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.top = Math.random() * 100 + 'vh';
-            heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+            heart.className = 'heart'; heart.innerText = '❤';
+            heart.style.left = Math.random() * 100 + 'vw'; heart.style.top = Math.random() * 100 + 'vh';
             document.body.appendChild(heart);
         }
 
@@ -76,30 +69,23 @@
             scoreEl.innerText = score; timerEl.innerText = timeLeft.toFixed(1);
             gameOverEl.style.display = 'none'; target.style.display = 'block';
             clearInterval(gameInterval); clearInterval(targetInterval);
-            
             gameInterval = setInterval(() => {
                 timeLeft -= 0.1;
                 if (timeLeft <= 0) endGame();
                 else timerEl.innerText = timeLeft.toFixed(1);
             }, 100);
-
             moveTarget();
-            // 사진 이동 속도를 1초로 설정
             targetInterval = setInterval(moveTarget, 1000); 
         }
 
         function hitTarget(e) { 
-            if(e && e.type === 'touchstart') e.preventDefault(); // 터치 시 중복 실행 방지
-            score++; 
-            scoreEl.innerText = score; 
-            moveTarget(); // 클릭하면 바로 도망
+            if(e && e.cancelable) e.preventDefault();
+            score++; scoreEl.innerText = score; moveTarget();
         }
 
         function moveTarget() {
-            // 화면 크기에 맞춰서 이동 범위 자동 조절
-            const padding = 20; // 화면 가장자리 여백
-            const x = Math.random() * (window.innerWidth - target.offsetWidth - padding * 2) + padding;
-            const y = Math.random() * (window.innerHeight - target.offsetHeight - 250) + 150;
+            const x = Math.random() * (window.innerWidth - 130);
+            const y = Math.random() * (window.innerHeight - 300) + 150;
             target.style.left = x + 'px'; target.style.top = y + 'px';
         }
 
