@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title> 박정훈 보고싶어 !!!</title>
+    <style>
+        /* 킹받는 핑크 공주 감성 */
+        body { background-color: #ffb6c1; font-family: 'Courier New', monospace; overflow: hidden; text-align: center; user-select: none; padding-top: 50px; position: relative; }
+        
+        .header { background: #ff69b4; color: yellow; padding: 10px; font-size: 2em; font-weight: bold; border-bottom: 5px solid yellow; animation: blink 0.2s infinite; display: inline-block; padding: 10px 30px; margin-bottom: 30px; z-index: 10;}
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .score-board { font-size: 1.5em; color: black; margin-bottom: 20px; display: flex; justify-content: space-around; background: #fff0f5; border: 3px solid; border-color: #fff #ff69b4 #ff69b4 #fff; padding: 10px; box-shadow: 5px 5px 0 rgba(0,0,0,0.5); width: 400px; margin: 0 auto 30px; z-index: 10; position: relative; }
+        #timer { color: red; font-weight: bold; }
+
+        /* 타겟 (정훈님 사진) */
+        #target { 
+            position: absolute; width: 150px; cursor: crosshair; display: none; 
+            border: 5px solid #ff1493; box-shadow: 0 0 20px #ff1493; 
+            transition: all 0.3s ease-out; /* 이동할 때 부드럽게 움직이도록 수정 */
+            z-index: 50;
+        }
+        
+        /* 마우스 올리면 사진이 커지면서 회전 */
+        #target:hover { transform: scale(1.2) rotate(10deg); }
+
+        #game-over { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 100; }
+        #game-over h2 { font-size: 3em; color: #ff69b4; }
+        button { background: #fff0f5; border: 2px solid; border-color: #fff #ff69b4 #ff69b4 #fff; padding: 10px 30px; font-size: 1.2em; cursor: pointer; font-weight: bold; color: black; margin-top: 20px;}
+        
+        /* 배경 하트 효과 */
+        .heart { position: absolute; color: rgba(255, 255, 255, 0.4); pointer-events: none; z-index: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="header"> 박정훈 때리기 </div>
+
+    <div class="score-board">
+        <div>타격: <span id="score">0</span>회</div>
+        <div>남은 시간: <span id="timer">5.0</span>초</div>
+    </div>
+
+    <img src="hoon.jpg" id="target" onclick="hitTarget()">
+
+    <div id="game-over">
+        <h2> 끝 !!!! </h2>
+        <p id="result-msg" style="font-size: 1.5em; margin: 20px; color: white;"></p>
+        <p style="color: yellow; margin-bottom: 30px;">※ 똥 먹어. ※</p>
+        <button onclick="startGame()">완전 버터떡이네 똥아</button>
+    </div>
+
+    <script>
+        let score = 0; let timeLeft = 5.0; let gameInterval; let targetInterval;
+        const target = document.getElementById('target');
+        const scoreEl = document.getElementById('score');
+        const timerEl = document.getElementById('timer');
+        const gameOverEl = document.getElementById('game-over');
+        const resultMsgEl = document.getElementById('result-msg');
+
+        // 하트 배경 생성
+        for(let i=0; i<30; i++) {
+            let heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerText = '❤';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = Math.random() * 100 + 'vh';
+            heart.style.fontSize = Math.random() * 30 + 10 + 'px';
+            document.body.appendChild(heart);
+        }
+
+        function startGame() {
+            score = 0; timeLeft = 5.0;
+            scoreEl.innerText = score; timerEl.innerText = timeLeft.toFixed(1);
+            gameOverEl.style.display = 'none'; target.style.display = 'block';
+            clearInterval(gameInterval); clearInterval(targetInterval);
+            
+            gameInterval = setInterval(() => {
+                timeLeft -= 0.1;
+                if (timeLeft <= 0) endGame();
+                else timerEl.innerText = timeLeft.toFixed(1);
+            }, 100);
+
+            moveTarget();
+            // ★ 이동 속도를 0.5초에서 1초로 늦췄습니다! ★
+            targetInterval = setInterval(moveTarget, 1000); 
+        }
+
+        function hitTarget() { 
+            score++; 
+            scoreEl.innerText = score; 
+            moveTarget(); // 클릭하면 바로 도망
+        }
+
+        function moveTarget() {
+            const x = Math.random() * (window.innerWidth - 150);
+            const y = Math.random() * (window.innerHeight - 300) + 150;
+            target.style.left = x + 'px'; target.style.top = y + 'px';
+        }
+
+        function endGame() {
+            clearInterval(gameInterval); clearInterval(targetInterval);
+            target.style.display = 'none'; gameOverEl.style.display = 'flex';
+            let msg = score < 5 ? `실패! 똥아저씨 <br>(타격: ${score}회)` : score < 12 ? `좀 치네<br>(타격: ${score}회)` : `보고싶어 사랑해 뇸뇸<br>(타격: ${score}회)`;
+            resultMsgEl.innerHTML = msg;
+        }
+
+        startGame();
+    </script>
+</body>
+</html>
